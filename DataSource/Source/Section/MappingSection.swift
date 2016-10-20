@@ -8,7 +8,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     
     var originIndex: Int
     
-    fileprivate var _objects: [Object?] = []
+    private var _objects: [Object?] = []
     
     // MARK: - Init
     
@@ -22,7 +22,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     
     // MARK: - UserInfo
     
-    fileprivate var _name: String?
+    private var _name: String?
     override var name: String? {
         get {
             return _name ?? origin[originIndex].name
@@ -33,7 +33,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
         }
     }
     
-    fileprivate var _userInfo: [String: AnyObject]?
+    private var _userInfo: [String: AnyObject]?
     override var userInfo: [String: AnyObject]? {
         get {
             return _userInfo ?? origin[originIndex].userInfo
@@ -54,7 +54,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
         return (0..<numberOfObjects).map { objectAtIndex($0) }
     }
     
-    func objectAtIndex(_ index: Int) -> Object {
+    func object(at index: Int) -> Object {
         if let object = _objects[index] {
             return object
         }
@@ -67,19 +67,19 @@ final class MappingSection<RawObject, Object>: Section<Object> {
 
     // MARK: - Mutation
     
-    func insert(_ object: Object?, atIndex index: Int) {
+    func insert(_ object: Object?, at index: Int) {
         _objects.insert(object, at: index)
     }
 
-    func removeObjectAtIndex(_ index: Int) -> Object? {
+    func remove(at index: Int) -> Object? {
         return _objects.remove(at: index)
     }
     
-    func invalidateObjectAtIndex(_ index: Int) {
+    func invalidate(at index: Int) {
         _objects[index] = nil
     }
     
-    func invalidateObjects() {
+    func invalidateAll() {
         _objects = Array(repeating: nil, count: origin.numberOfObjectsInSection(originIndex))
     }
 }

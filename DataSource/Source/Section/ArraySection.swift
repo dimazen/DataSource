@@ -3,16 +3,16 @@ import Foundation
 
 open class ArraySection<Object>: Section<Object> {
     
-    fileprivate var _objects: [Object]
+    private var _objects: [Object]
     
     // MARK: - Init
     
-    public init(name: String, objects: [Object]) {
+    open init(name: String, objects: [Object]) {
         _objects = objects
         super.init(name: name, userInfo: nil)
     }
     
-    public init(objects: [Object]) {
+    open init(objects: [Object]) {
         _objects = objects
         
         super.init()
@@ -20,7 +20,7 @@ open class ArraySection<Object>: Section<Object> {
     
     // MARK: - Section
     
-    func objectAtIndex(_ index: Int) -> Object {
+    func object(at index: Int) -> Object {
         return _objects[index]
     }
     
@@ -32,7 +32,7 @@ open class ArraySection<Object>: Section<Object> {
         return _objects.count
     }
     
-    subscript(index: Int) -> Object {
+    open internal(set) subscript(index: Int) -> Object {
         get {
             return _objects[index]
         }
@@ -44,18 +44,18 @@ open class ArraySection<Object>: Section<Object> {
     
     // MARK: - Mutation
     
-    func insert(_ object: Object, atIndex index: Int) {
+    func insert(_ object: Object, at index: Int) {
         _objects.insert(object, at: index)
     }
     
-    func removeAtIndex(_ index: Int) -> Object {
+    func remove(at index: Int) -> Object {
         return _objects.remove(at: index)
     }
 }
 
 extension ArraySection where Object: Equatable {
     
-    func indexOf(_ object: Object) -> Int? {
+    func index(of object: Object) -> Int? {
         return _objects.index(of: object)
     }
 }
