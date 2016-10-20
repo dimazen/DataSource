@@ -3,7 +3,7 @@ import Foundation
 
 final public class ArrayDataSource<Object>: DataSource<Object> {
     
-    fileprivate let resolver: ((Void) -> [ArraySection<Object>])?
+    private let resolver: ((Void) -> [ArraySection<Object>])?
     
     // MARK: - Init
     
@@ -29,7 +29,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
     
     // MARK: - Batch Update
 
-    fileprivate var updating: Bool = false
+    private var updating: Bool = false
 
     public func beginUpdate() {
         precondition(updating == false)
@@ -45,7 +45,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         send(.didEndUpdate)
     }
 
-    public func apply(_ silently: Bool = false, changes: (Void) -> Void) {
+    public func apply(silently: Bool = false, changes: (Void) -> Void) {
         if silently {
             disableEvents()
             
@@ -65,7 +65,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
 
     // MARK: - Invalidation
 
-    fileprivate var invalidated: Bool = true
+    private var invalidated: Bool = true
     
     override public func invalidate() {
         invalidated = true
@@ -77,7 +77,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         reload(resolver?() ?? [])
     }
     
-    fileprivate func reload(_ sections: [ArraySection<Object>]) {
+    private func reload(sections: [ArraySection<Object>]) {
         _sections = sections
         invalidated = false
         
@@ -86,8 +86,8 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
 
     // MARK: - Access
     
-    fileprivate var _sections: [ArraySection<Object>] = []
-    public fileprivate(set) var sections: [ArraySection<Object>] {
+    private var _sections: [ArraySection<Object>] = []
+    public private(set) var sections: [ArraySection<Object>] {
         get {
             if invalidated {
                 reload()
@@ -105,26 +105,26 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         return sections.count
     }
     
-    public override func sectionAtIndex(_ index: Int) -> Section<Object> {
+    public override func section(at index: Int) -> Section<Object> {
         return sections[index]
     }
 
-    override public func numberOfObjectsInSection(_ section: Int) -> Int {
+    override public func numberOfObjects(inSection section: Int) -> Int {
         return sections[section].numberOfObjects
     }
     
-    override public func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
-        return sections[(indexPath as NSIndexPath).section].objectAtIndex((indexPath as NSIndexPath).item)
+    override public func object(at indexPath: IndexPath) -> Object {
+        return sections[indexPath.section].object(at: indexPath.item)
     }
     
     // MARK: - Mutation:Objects
     
-    public func appendObject(_ object: Object, toSection sectionIndex: Int) {
+    public func append(_ object: Object, toSection sectionIndex: Int) {
         let insertionIndex = sections[sectionIndex].objects.endIndex
         insertObject(object, atIndex: insertionIndex, toSection: sectionIndex)
     }
     
-    public func appendObject(_ object: Object) {
+    public func append(_ object: Object) {
         if sections.isEmpty {
             appendSection(ArraySection(objects: [object]))
         } else {
@@ -132,7 +132,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    public func insertObject(_ object: Object, atIndex index: Int, toSection sectionIndex: Int) {
+    public func insert(_ object: Object, at index: Int, toSection sectionIndex: Int) {
         apply {
             sections[sectionIndex].insert(object, atIndex: index)
             
@@ -141,7 +141,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    public func removeObjectAtIndex(_ index: Int, inSection sectionIndex: Int) {
+    public func remove(at index: Int, inSection sectionIndex: Int) {
         apply {
             sections[sectionIndex].removeAtIndex(index)
             
@@ -150,23 +150,23 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    public func removeObjectAtIndexPath(_ indexPath: IndexPath) {
-        removeObjectAtIndex((indexPath as NSIndexPath).item, inSection: (indexPath as NSIndexPath).section)
+    public func remove(at indexPath: IndexPath) {
+        removeObjectAtIndex(indexPath.item, inSection: indexPath.section)
     }
     
-    public func replaceObjectAtIndexPath(_ indexPath: IndexPath, withObject object: Object) {
+    public func replace(at indexPath: IndexPath, with object: Object) {
         apply {
-            sections[(indexPath as NSIndexPath).section][(indexPath as NSIndexPath).item] = object
+            sections[indexPath.section][indexPath.item] = object
             
             let change = ObjectChange(type: .update, source: indexPath)
             send(.objectUpdate(change))
         }
     }
     
-    public func moveObjectAtIndexPath(_ indexPath: IndexPath, to toIndexPath: IndexPath) {
+    public func move(at indexPath: IndexPath, to toIndexPath: IndexPath) {
         apply {
-            let object = sections[(indexPath as NSIndexPath).section].removeAtIndex((indexPath as NSIndexPath).item)
-            sections[(toIndexPath as NSIndexPath).section].insert(object, atIndex: (toIndexPath as NSIndexPath).item)
+            let object = sections[indexPath.section].removeAtIndex(indexPath.item)
+            sections[toIndexPath.section].insert(object, atIndex: toIndexPath.item)
             
             let change = ObjectChange(type: .move, source: indexPath, target: toIndexPath)
             send(.objectUpdate(change))
@@ -175,11 +175,11 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
     
     // MARK: - Mutation:Sections
     
-    public func appendSection(_ section: ArraySection<Object>) {
+    public func append(section: ArraySection<Object>) {
         insertSection(section, atIndex: sections.endIndex)
     }
     
-    public func insertSection(_ section: ArraySection<Object>, atIndex index: Int) {
+    public func insert(section: ArraySection<Object>, at index: Int) {
         apply {
             sections.insert(section, at: index)
 
@@ -188,7 +188,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    public func removeSectionAtIndex(_ index: Int) {
+    public func remove(sectionAt index: Int) {
         apply {
             sections.remove(at: index)
             
@@ -207,7 +207,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
     
     // MARK: - Search
     
-    public func indexPathOf(_ predicate: (Object) -> Bool) -> IndexPath? {
+    public func indexPath(of predicate: (Object) -> Bool) -> IndexPath? {
         for (sectionIndex, section) in sections.enumerated() {
             for (objectIndex, object) in section.objects.enumerated() {
                 if predicate(object) {
@@ -222,7 +222,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
 
 extension ArrayDataSource where Object: Equatable {
  
-    public func removeObject(_ object: Object) {
+    public func remove(_ object: Object) {
         if let indexPath = indexPathOf(object) {
             removeObjectAtIndexPath(indexPath)
         }
@@ -231,7 +231,7 @@ extension ArrayDataSource where Object: Equatable {
     /**
      Complexity O(n)
      */
-    public func indexPathOf(_ object: Object) -> IndexPath? {
+    public func indexPath(of object: Object) -> IndexPath? {
         for index in 0..<sectionsCount {
             if let objectIndex = sections[index].indexOf(object) {
                 return IndexPath(item: objectIndex, section: index)

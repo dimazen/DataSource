@@ -6,11 +6,11 @@ open class DataSource<Object> {
     
     // MARK: - Init
     
-    public init() {}
+    open init() {}
     
     // MARK: - Observation
     
-    fileprivate let observers = DisablingObserverSet<Event>()
+    private let observers = DisablingObserverSet<Event>()
 
     open func observe(_ changes: (Event) -> Void) -> Disposable {
         return observers.add(changes)
@@ -34,24 +34,24 @@ open class DataSource<Object> {
         fatalError("Not Implemented")
     }
     
-    open func sectionAtIndex(_ index: Int) -> Section<Object> {
+    open func section(at index: Int) -> Section<Object> {
         fatalError("Not Implemented")
     }
     
-    open func numberOfObjectsInSection(_ section: Int) -> Int {
+    open func numberOfObjects(inSection section: Int) -> Int {
         return sectionAtIndex(section).numberOfObjects
     }
     
-    open func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
-        return sectionAtIndex((indexPath as NSIndexPath).section).objects[(indexPath as NSIndexPath).item]
+    open func object(at indexPath: IndexPath) -> Object {
+        return section(at: indexPath.section).objects[indexPath.item]
     }
     
     open subscript(indexPath: IndexPath) -> Object {
-        return objectAtIndexPath(indexPath)
+        return object(at: indexPath)
     }
     
     open subscript(index: Int) -> Section<Object> {
-        return sectionAtIndex(index)
+        return section(at: index)
     }
       
     // MARK: - Reload
@@ -67,7 +67,7 @@ open class DataSource<Object> {
 
 extension DataSource {
     
-    public var isEmpty: Bool {
+    open var isEmpty: Bool {
         if sectionsCount == 0 {
             return true
         }

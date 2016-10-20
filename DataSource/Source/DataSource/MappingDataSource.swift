@@ -5,9 +5,9 @@ import Observer
 final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     public typealias Map = (RawObject) -> Object
-    fileprivate let map: Map
+    private let map: Map
     
-    fileprivate var disposable: Disposable?
+    private var disposable: Disposable?
     public let origin: DataSource<RawObject>
     
     // MARK: - Init
@@ -29,8 +29,8 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Sections
     
-    fileprivate var _sections: [MappingSection<RawObject, Object>] = []
-    fileprivate var sections: [MappingSection<RawObject, Object>] {
+    private var _sections: [MappingSection<RawObject, Object>] = []
+    private var sections: [MappingSection<RawObject, Object>] {
         get {
             if invalidated {
                 reload()
@@ -52,31 +52,31 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         return sections.count
     }
     
-    public override func sectionAtIndex(_ index: Int) -> Section<Object> {
+    public override func section(at index: Int) -> Section<Object> {
         return sections[index]
     }
     
-    override public func numberOfObjectsInSection(_ section: Int) -> Int {
+    override public func numberOfObjects(inSection section: Int) -> Int {
         return sections[section].numberOfObjects
     }
     
-    override public func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
-        return sections[(indexPath as NSIndexPath).section].objectAtIndex((indexPath as NSIndexPath).item)
+    override public func object(at indexPath: IndexPath) -> Object {
+        return sections[indexPath.section].objectAtIndex(indexPath.item)
     }
     
     // MARK: - Reload
     
-    fileprivate var invalidated = true
-    override public func invalidate() {
+    private var invalidated = true
+    override open func invalidate() {
         invalidated = true
         
         send(.invalidate)
     }
     
     // to prevent double reloading when MappingDataSource cause Origin to reload
-    fileprivate var reloading = true
+    private var reloading = true
     
-    override public func reload() {
+    override open func reload() {
         reloading = true
         
         _sections = (0..<origin.sectionsCount).map { return MappingSection(origin: self.origin, originIndex: $0, map: self.map) }
@@ -88,21 +88,21 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         send(.reload)
     }
     
-    public func reloadObjectAtIndexPath(_ indexPath: IndexPath) {
-        let section = sections[(indexPath as NSIndexPath).section]
-        section.invalidateObjectAtIndex((indexPath as NSIndexPath).item)
+    public func reload(at indexPath: IndexPath) {
+        let section = sections[indexPath.section]
+        section.invalidate(at: indexPath.item)
         
         let change = ObjectChange(type: .update, source: indexPath)
         send(.objectUpdate(change))
     }
     
-    fileprivate var sectionsIndexInvalid = true
+    private var sectionsIndexInvalid = true
     
-    fileprivate func setNeedsSectionReindex() {
+    private func setNeedsSectionReindex() {
         sectionsIndexInvalid = true
     }
     
-    fileprivate func reindexSectionsIfNeeded() {
+    private func reindexSectionsIfNeeded() {
         if sectionsIndexInvalid {
             for (index, section) in _sections.enumerated() {
                 section.originIndex = index
@@ -114,7 +114,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Events Handling
     
-    fileprivate func handleEvent(_ event: Event) {
+    private func handleEvent(_ event: Event) {
         switch event {
         case .invalidate:
             invalidate()
@@ -141,7 +141,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         }
     }
     
-    fileprivate func applyObjectChange(_ change: ObjectChange) {
+    private func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
         case .insert:
             sections[change.target.section].insert(nil, atIndex: change.target.item)
@@ -158,7 +158,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         }
     }
     
-    fileprivate func applySectionChange(_ change: SectionChange) {
+    private func applySectionChange(_ change: SectionChange) {
         switch change.type {
         case .insert:
             for index in change.indexes {
@@ -182,7 +182,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Search
     
-    public func indexPathOf(_ predicate: (Object) -> Bool) -> IndexPath? {
+    public func indexPath(of predicate: (Object) -> Bool) -> IndexPath? {
         for (sectionIndex, section) in sections.enumerated() {
             for objectIndex in 0..<numberOfObjectsInSection(sectionIndex) {
                 if predicate(section.objectAtIndex(objectIndex)) {
