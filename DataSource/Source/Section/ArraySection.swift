@@ -48,6 +48,7 @@ open class ArraySection<Object>: Section<Object> {
         _objects.insert(object, at: index)
     }
     
+    @discardableResult
     func remove(at index: Int) -> Object {
         return _objects.remove(at: index)
     }
