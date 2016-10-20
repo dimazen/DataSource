@@ -3,32 +3,32 @@ import Foundation
 
 public enum ChangeType {
     
-    case Insert, Delete, Move, Update
+    case insert, delete, move, update
 }
 
 public struct SectionChange {
 
     var type: ChangeType
-    var indexes: NSIndexSet
+    var indexes: IndexSet
 }
 
 public struct ObjectChange {
     
     var type: ChangeType
-    var source: NSIndexPath!
-    var target: NSIndexPath!
+    var source: IndexPath!
+    var target: IndexPath!
     
-    public init(type: ChangeType, source: NSIndexPath) {
+    public init(type: ChangeType, source: IndexPath) {
         self.type = type
         self.source = source
     }
     
-    public init(type: ChangeType, target: NSIndexPath) {
+    public init(type: ChangeType, target: IndexPath) {
         self.type = type
         self.target = target
     }
     
-    public init(type: ChangeType, source: NSIndexPath, target: NSIndexPath) {
+    public init(type: ChangeType, source: IndexPath, target: IndexPath) {
         self.type = type
         self.source = source
         self.target = target
@@ -37,8 +37,8 @@ public struct ObjectChange {
 
 public enum Event {
 
-    case Invalidate, Reload, WillBeginUpdate, DidEndUpdate
+    case invalidate, reload, willBeginUpdate, didEndUpdate
     
-    case SectionUpdate(SectionChange)
-    case ObjectUpdate(ObjectChange)
+    case sectionUpdate(SectionChange)
+    case objectUpdate(ObjectChange)
 }

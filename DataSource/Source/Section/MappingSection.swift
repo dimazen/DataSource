@@ -4,7 +4,7 @@ import Foundation
 final class MappingSection<RawObject, Object>: Section<Object> {
     
     let origin: DataSource<RawObject>
-    let map: RawObject -> Object
+    let map: (RawObject) -> Object
     
     var originIndex: Int
     
@@ -12,12 +12,12 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     
     // MARK: - Init
     
-    init(origin: DataSource<RawObject>, originIndex: Int, map: RawObject -> Object) {
+    init(origin: DataSource<RawObject>, originIndex: Int, map: @escaping (RawObject) -> Object) {
         self.origin = origin
         self.originIndex = originIndex
         self.map = map
         
-        _objects = Array(count: origin.numberOfObjectsInSection(originIndex), repeatedValue: nil)
+        _objects = Array(repeating: nil, count: origin.numberOfObjects(inSection: originIndex))
     }
     
     // MARK: - UserInfo
@@ -51,15 +51,15 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     }
     
     override var objects: [Object] {
-        return (0..<numberOfObjects).map { objectAtIndex($0) }
+        return (0..<numberOfObjects).map { object(at: $0) }
     }
     
-    func objectAtIndex(index: Int) -> Object {
+    func object(at index: Int) -> Object {
         if let object = _objects[index] {
             return object
         }
         
-        let object = map(origin.objectAtIndexPath(NSIndexPath(forItem: index, inSection: originIndex)))
+        let object = map(origin.object(at: IndexPath(item: index, section: originIndex)))
         _objects[index] = object
         
         return object
@@ -67,19 +67,19 @@ final class MappingSection<RawObject, Object>: Section<Object> {
 
     // MARK: - Mutation
     
-    func insert(object: Object?, atIndex index: Int) {
-        _objects.insert(object, atIndex: index)
+    func insert(_ object: Object?, at index: Int) {
+        _objects.insert(object, at: index)
     }
 
-    func removeObjectAtIndex(index: Int) -> Object? {
-        return _objects.removeAtIndex(index)
+    func remove(at index: Int) -> Object? {
+        return _objects.remove(at: index)
     }
     
-    func invalidateObjectAtIndex(index: Int) {
+    func invalidate(at index: Int) {
         _objects[index] = nil
     }
     
-    func invalidateObjects() {
-        _objects = Array(count: origin.numberOfObjectsInSection(originIndex), repeatedValue: nil)
+    func invalidateAll() {
+        _objects = Array(repeating: nil, count: origin.numberOfObjects(inSection: originIndex))
     }
 }

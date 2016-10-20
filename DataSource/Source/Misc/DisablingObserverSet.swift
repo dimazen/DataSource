@@ -6,10 +6,10 @@ final class DisablingObserverSet<T>: ObserverSet<T> {
 
     override init() {}
 
-    private var counterLock: OSSpinLock = OS_SPINLOCK_INIT
+    fileprivate var counterLock: OSSpinLock = OS_SPINLOCK_INIT
 
-    private var _disabledCounter: Int = 0
-    private var disabledCounter: Int {
+    fileprivate var _disabledCounter: Int = 0
+    fileprivate var disabledCounter: Int {
         get {
             let value: Int
 
@@ -43,7 +43,7 @@ final class DisablingObserverSet<T>: ObserverSet<T> {
         disabledCounter += 1
     }
 
-    override func send(value: T) {
+    override func send(_ value: T) {
         if enabled {
             super.send(value)
         }

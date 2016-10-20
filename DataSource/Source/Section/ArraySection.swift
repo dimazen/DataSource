@@ -1,9 +1,9 @@
 
 import Foundation
 
-public class ArraySection<Object>: Section<Object> {
+open class ArraySection<Object>: Section<Object> {
     
-    private var _objects: [Object]
+    fileprivate var _objects: [Object]
     
     // MARK: - Init
     
@@ -20,19 +20,19 @@ public class ArraySection<Object>: Section<Object> {
     
     // MARK: - Section
     
-    func objectAtIndex(index: Int) -> Object {
+    func object(at index: Int) -> Object {
         return _objects[index]
     }
     
-    override public var objects: [Object] {
+    override open var objects: [Object] {
         return _objects
     }
     
-    override public var numberOfObjects: Int {
+    override open var numberOfObjects: Int {
         return _objects.count
     }
     
-    subscript(index: Int) -> Object {
+    open internal(set) subscript(index: Int) -> Object {
         get {
             return _objects[index]
         }
@@ -44,18 +44,18 @@ public class ArraySection<Object>: Section<Object> {
     
     // MARK: - Mutation
     
-    func insert(object: Object, atIndex index: Int) {
-        _objects.insert(object, atIndex: index)
+    func insert(_ object: Object, at index: Int) {
+        _objects.insert(object, at: index)
     }
     
-    func removeAtIndex(index: Int) -> Object {
-        return _objects.removeAtIndex(index)
+    func remove(at index: Int) -> Object {
+        return _objects.remove(at: index)
     }
 }
 
 extension ArraySection where Object: Equatable {
     
-    func indexOf(object: Object) -> Int? {
-        return _objects.indexOf(object)
+    func index(of object: Object) -> Int? {
+        return _objects.index(of: object)
     }
 }

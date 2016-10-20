@@ -2,7 +2,7 @@
 import Foundation
 import Observer
 
-public class DataSource<Object> {
+open class DataSource<Object> {
     
     // MARK: - Init
     
@@ -12,68 +12,68 @@ public class DataSource<Object> {
     
     private let observers = DisablingObserverSet<Event>()
 
-    public func observe(changes: Event -> Void) -> Disposable {
+    open func observe(_ changes: @escaping (Event) -> Void) -> Disposable {
         return observers.add(changes)
     }
     
-    public func send(event: Event) {
+    open func send(_ event: Event) {
         observers.send(event)
     }
     
-    public func enableEvents() {
+    open func enableEvents() {
         observers.enable()
     }
     
-    public func disableEvents() {
+    open func disableEvents() {
         observers.disable()
     }
     
     // MARK: - Data Access
     
-    public var sectionsCount: Int {
+    open var sectionsCount: Int {
         fatalError("Not Implemented")
     }
     
-    public func sectionAtIndex(index: Int) -> Section<Object> {
+    open func section(at index: Int) -> Section<Object> {
         fatalError("Not Implemented")
     }
     
-    public func numberOfObjectsInSection(section: Int) -> Int {
-        return sectionAtIndex(section).numberOfObjects
+    open func numberOfObjects(inSection index: Int) -> Int {
+        return section(at: index).numberOfObjects
     }
     
-    public func objectAtIndexPath(indexPath: NSIndexPath) -> Object {
-        return sectionAtIndex(indexPath.section).objects[indexPath.item]
+    open func object(at indexPath: IndexPath) -> Object {
+        return section(at: indexPath.section).objects[indexPath.item]
     }
     
-    public subscript(indexPath: NSIndexPath) -> Object {
-        return objectAtIndexPath(indexPath)
+    open subscript(indexPath: IndexPath) -> Object {
+        return object(at: indexPath)
     }
     
-    public subscript(index: Int) -> Section<Object> {
-        return sectionAtIndex(index)
+    open subscript(index: Int) -> Section<Object> {
+        return section(at: index)
     }
       
     // MARK: - Reload
     
-    public func invalidate() {
-        send(.Invalidate)
+    open func invalidate() {
+        send(.invalidate)
     }
     
-    public func reload() {
-        send(.Reload)
+    open func reload() {
+        send(.reload)
     }
 }
 
 extension DataSource {
     
-    public var isEmpty: Bool {
+    open var isEmpty: Bool {
         if sectionsCount == 0 {
             return true
         }
         
         for index in 0..<sectionsCount {
-            if numberOfObjectsInSection(index) > 0 {
+            if numberOfObjects(inSection: index) > 0 {
                 return false
             }
         }

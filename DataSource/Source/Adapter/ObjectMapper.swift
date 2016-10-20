@@ -5,29 +5,29 @@ public protocol ObjectMappable {
     
     var cellIdentifier: String { get }
     
-    func supportsObject(object: Any) -> Bool
+    func supports(_ object: Any) -> Bool
     
-    func mapObject(object: Any, toCell cell: Any, atIndexPath: NSIndexPath)
+    func map(object: Any, toCell cell: Any, at: IndexPath)
 }
 
-public class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
+final public class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
     
-    private let map: (Object, Cell, NSIndexPath) -> Void
+    private let map: (Object, Cell, IndexPath) -> Void
     
-    public init(map: (Object, Cell, NSIndexPath) -> Void) {
+    public init(map: @escaping (Object, Cell, IndexPath) -> Void) {
         self.map = map
     }
     
     public var cellIdentifier: String {
-        return String(Cell.self)
+        return String(describing: Cell.self)
     }
     
-    public func supportsObject(object: Any) -> Bool {
+    public func supports(_ object: Any) -> Bool {
         return object is Object
     }
     
-    public func mapObject(object: Any, toCell cell: Any, atIndexPath indexPath: NSIndexPath) {
-        if let object = object as? Object, cell = cell as? Cell {
+    public func map(object: Any, toCell cell: Any, at indexPath: IndexPath) {
+        if let object = object as? Object, let cell = cell as? Cell {
             map(object, cell, indexPath)
         }
     }
@@ -44,7 +44,7 @@ extension ObjectConsumingMapper where Cell: ObjectConsuming, Cell.Object == Obje
     
     convenience public init() {
         self.init { object, consumer, _ in
-            consumer.apply(object)
+            consumer.apply(object: object)
         }
     }
 }

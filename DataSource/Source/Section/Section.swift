@@ -1,21 +1,22 @@
 
 import Foundation
 
-public class Section<Object> {
+open class Section<Object> {
     
-    public var name: String?
-    public var userInfo: [String: AnyObject]?
+    open var name: String?
+    open var userInfo: [String: AnyObject]?
     
-    public var objects: [Object] {
+    open var objects: [Object] {
         fatalError("Not implemented")
     }
     
-    public var numberOfObjects: Int {
+    open var numberOfObjects: Int {
         return objects.count
     }
     
     public init(name: String? = nil, userInfo: [String: AnyObject]? = nil) {
         self.name = name
         self.userInfo = userInfo
+        
     }
 }
