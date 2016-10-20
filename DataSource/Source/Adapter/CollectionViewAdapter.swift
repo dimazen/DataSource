@@ -42,9 +42,7 @@ open class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, 
     
     open func reload(animated: Bool = false) {
         if animated {
-            // todo: review
-            let range = NSMakeRange(0, collectionView.numberOfSections)
-            collectionView.reloadSections(IndexSet(integersIn: range.toRange() ?? 0..<0))
+            collectionView.reloadSections(IndexSet(integersIn: 0..<collectionView.numberOfSections))
         } else {
             collectionView.reloadData()
         }

@@ -42,9 +42,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     
     open func reload(animated: Bool = false) {
         if animated {
-            // todo: review
-            let range = NSMakeRange(0, tableView.numberOfSections)
-            tableView.reloadSections(IndexSet(integersIn: range.toRange() ?? 0..<0), with: .automatic)
+            tableView.reloadSections(IndexSet(integersIn: 0..<tableView.numberOfSections), with: .automatic)
         } else {
             tableView.reloadData()
         }
