@@ -15,7 +15,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     
     // MARK: - DataSource
     
-    fileprivate var disposable: Disposable?
+    private var disposable: Disposable?
     
     open var dataSource: DataSource<Object>! {
         didSet {
@@ -40,8 +40,9 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     
     // MARK: - Reloading
     
-    open func reload(_ animated: Bool = false) {
+    open func reload(animated: Bool = false) {
         if animated {
+            // todo: review
             let range = NSMakeRange(0, tableView.numberOfSections)
             tableView.reloadSections(IndexSet(integersIn: range.toRange() ?? 0..<0), with: .automatic)
         } else {
@@ -49,19 +50,19 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
         }
     }
     
-    open func reloadIndexPath(_ indexPath: IndexPath, animated: Bool) {
+    open func reload(at indexPath: IndexPath, animated: Bool) {
         tableView.reloadRows(at: [indexPath], with: animated ? .automatic : .none)
     }
     
     // MARK: - Mapping
     
-    fileprivate var registeredMappers: [ObjectMappable] = []
+    private var registeredMappers: [ObjectMappable] = []
     
-    open func registerMapper(_ mapper: ObjectMappable) {
+    open func register(mapper: ObjectMappable) {
         registeredMappers.append(mapper)
     }
     
-    fileprivate func mapperForObject(_ object: Object) -> ObjectMappable? {
+    private func mapper(for object: Object) -> ObjectMappable? {
         if let index = registeredMappers.index(where: { $0.supportsObject(object) }) {
             return registeredMappers[index]
         }
@@ -71,10 +72,10 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     
     // MARK: - Event Handling
     
-    fileprivate var pendingEvents: [Event] = []
-    fileprivate var collectUpdateEvents = false
+    private var pendingEvents: [Event] = []
+    private var collectUpdateEvents = false
     
-    fileprivate func handleEvent(_ event: Event) {
+    private func handleEvent(_ event: Event) {
         switch event {
         case .invalidate:
             // no-op
@@ -107,7 +108,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
         }
     }
     
-    fileprivate func applyEvents(_ events: [Event]) {
+    private func applyEvents(_ events: [Event]) {
         for event in events {
             switch event {
             case .objectUpdate(let change):
@@ -122,7 +123,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
         }
     }
     
-    fileprivate func applyObjectChange(_ change: ObjectChange) {
+    private func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
         case .insert:
             tableView.insertRows(at: [change.target as IndexPath], with: .automatic)
@@ -138,7 +139,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
         }
     }
     
-    fileprivate func applySectionChange(_ change: SectionChange) {
+    private func applySectionChange(_ change: SectionChange) {
         switch change.type {
         case .insert:
             tableView.insertSections(change.indexes as IndexSet, with: .automatic)
@@ -166,7 +167,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
 
     open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let object = dataSource.objectAtIndexPath(indexPath)
-        guard let mapper = mapperForObject(object) else {
+        guard let mapper = mapper(for: object) else {
             fatalError("You have to provide mapper that supports \(type(of: object))")
         }
         
@@ -183,14 +184,14 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     open var didSelect: Selection?
     
     open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let object = dataSource.objectAtIndexPath(indexPath)
+        let object = dataSource.object(at: indexPath)
         didSelect?(object, indexPath)
     }
     
     open var didDeselect: Selection?
     
     open func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        let object = dataSource.objectAtIndexPath(indexPath)
+        let object = dataSource.object(at: indexPath)
         didDeselect?(object, indexPath)
     }
     

@@ -182,7 +182,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Search
     
-    public func indexPath(of predicate: (Object) -> Bool) -> IndexPath? {
+    public func indexPath(where predicate: (Object) -> Bool) -> IndexPath? {
         for (sectionIndex, section) in sections.enumerated() {
             for objectIndex in 0..<numberOfObjectsInSection(sectionIndex) {
                 if predicate(section.objectAtIndex(objectIndex)) {
