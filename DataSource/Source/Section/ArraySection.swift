@@ -3,16 +3,16 @@ import Foundation
 
 open class ArraySection<Object>: Section<Object> {
     
-    private var _objects: [Object]
+    fileprivate var _objects: [Object]
     
     // MARK: - Init
     
-    open init(name: String, objects: [Object]) {
+    public init(name: String, objects: [Object]) {
         _objects = objects
         super.init(name: name, userInfo: nil)
     }
     
-    open init(objects: [Object]) {
+    public init(objects: [Object]) {
         _objects = objects
         
         super.init()

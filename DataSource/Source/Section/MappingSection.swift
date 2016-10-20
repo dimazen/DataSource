@@ -17,7 +17,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
         self.originIndex = originIndex
         self.map = map
         
-        _objects = Array(repeating: nil, count: origin.numberOfObjectsInSection(originIndex))
+        _objects = Array(repeating: nil, count: origin.numberOfObjects(inSection: originIndex))
     }
     
     // MARK: - UserInfo
@@ -51,7 +51,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     }
     
     override var objects: [Object] {
-        return (0..<numberOfObjects).map { objectAtIndex($0) }
+        return (0..<numberOfObjects).map { object(at: $0) }
     }
     
     func object(at index: Int) -> Object {
@@ -59,7 +59,7 @@ final class MappingSection<RawObject, Object>: Section<Object> {
             return object
         }
         
-        let object = map(origin.objectAtIndexPath(IndexPath(item: index, section: originIndex)))
+        let object = map(origin.object(at: IndexPath(item: index, section: originIndex)))
         _objects[index] = object
         
         return object
@@ -80,6 +80,6 @@ final class MappingSection<RawObject, Object>: Section<Object> {
     }
     
     func invalidateAll() {
-        _objects = Array(repeating: nil, count: origin.numberOfObjectsInSection(originIndex))
+        _objects = Array(repeating: nil, count: origin.numberOfObjects(inSection: originIndex))
     }
 }

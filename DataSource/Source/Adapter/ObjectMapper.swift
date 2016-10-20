@@ -5,7 +5,7 @@ public protocol ObjectMappable {
     
     var cellIdentifier: String { get }
     
-    func supports(object: Any) -> Bool
+    func supports(_ object: Any) -> Bool
     
     func map(object: Any, toCell cell: Any, at: IndexPath)
 }
@@ -22,7 +22,7 @@ final public class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
         return String(describing: Cell.self)
     }
     
-    public func supports(object: Any) -> Bool {
+    public func supports(_ object: Any) -> Bool {
         return object is Object
     }
     

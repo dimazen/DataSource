@@ -61,7 +61,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     }
     
     override public func object(at indexPath: IndexPath) -> Object {
-        return sections[indexPath.section].objectAtIndex(indexPath.item)
+        return sections[indexPath.section].object(at: indexPath.item)
     }
     
     // MARK: - Reload
@@ -144,17 +144,17 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     private func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
         case .insert:
-            sections[change.target.section].insert(nil, atIndex: change.target.item)
+            sections[change.target.section].insert(nil, at: change.target.item)
             
         case .delete:
-            sections[change.source.section].removeObjectAtIndex(change.source.item)
+            sections[change.source.section].remove(at: change.source.item)
             
         case .move:
-            let object = sections[change.source.section].removeObjectAtIndex(change.source.item)
-            sections[change.target.section].insert(object, atIndex: change.target.item)
+            let object = sections[change.source.section].remove(at: change.source.item)
+            sections[change.target.section].insert(object, at: change.target.item)
             
         case .update:
-            sections[change.source.section].invalidateObjectAtIndex(change.source.item)
+            sections[change.source.section].invalidate(at: change.source.item)
         }
     }
     
@@ -175,7 +175,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
             
         case .update:
             for index in change.indexes {
-                sections[index].invalidateObjects()
+                sections[index].invalidateAll()
             }
         }
     }
@@ -184,8 +184,8 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     public func indexPath(where predicate: (Object) -> Bool) -> IndexPath? {
         for (sectionIndex, section) in sections.enumerated() {
-            for objectIndex in 0..<numberOfObjectsInSection(sectionIndex) {
-                if predicate(section.objectAtIndex(objectIndex)) {
+            for objectIndex in 0..<numberOfObjects(inSection: sectionIndex) {
+                if predicate(section.object(at: objectIndex)) {
                     return IndexPath(item: objectIndex, section: sectionIndex)
                 }
             }

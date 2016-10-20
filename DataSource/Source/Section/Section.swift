@@ -14,7 +14,7 @@ open class Section<Object> {
         return objects.count
     }
     
-    open init(name: String? = nil, userInfo: [String: AnyObject]? = nil) {
+    public init(name: String? = nil, userInfo: [String: AnyObject]? = nil) {
         self.name = name
         self.userInfo = userInfo
         

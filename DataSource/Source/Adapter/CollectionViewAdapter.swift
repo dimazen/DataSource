@@ -59,7 +59,7 @@ open class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, 
     }
     
     private func mapper(for object: Object) -> ObjectMappable? {
-        if let index = registeredMappers.index(where: { $0.supportsObject(object) }) {
+        if let index = registeredMappers.index(where: { $0.supports(object) }) {
             return registeredMappers[index]
         }
         
@@ -158,7 +158,7 @@ open class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, 
     }
   
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return dataSource.numberOfObjectsInSection(section)
+        return dataSource.numberOfObjects(inSection: section)
     }
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -168,7 +168,7 @@ open class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, 
         }
         
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: mapper.cellIdentifier, for: indexPath)
-        mapper.mapObject(object, toCell: cell, atIndexPath: indexPath)
+        mapper.map(object: object, toCell: cell, at: indexPath)
         
         return cell
     }

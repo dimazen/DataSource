@@ -6,13 +6,13 @@ open class DataSource<Object> {
     
     // MARK: - Init
     
-    open init() {}
+    public init() {}
     
     // MARK: - Observation
     
     private let observers = DisablingObserverSet<Event>()
 
-    open func observe(_ changes: (Event) -> Void) -> Disposable {
+    open func observe(_ changes: @escaping (Event) -> Void) -> Disposable {
         return observers.add(changes)
     }
     
@@ -38,8 +38,8 @@ open class DataSource<Object> {
         fatalError("Not Implemented")
     }
     
-    open func numberOfObjects(inSection section: Int) -> Int {
-        return sectionAtIndex(section).numberOfObjects
+    open func numberOfObjects(inSection index: Int) -> Int {
+        return section(at: index).numberOfObjects
     }
     
     open func object(at indexPath: IndexPath) -> Object {
@@ -73,7 +73,7 @@ extension DataSource {
         }
         
         for index in 0..<sectionsCount {
-            if numberOfObjectsInSection(index) > 0 {
+            if numberOfObjects(inSection: index) > 0 {
                 return false
             }
         }

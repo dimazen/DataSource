@@ -63,7 +63,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     }
     
     private func mapper(for object: Object) -> ObjectMappable? {
-        if let index = registeredMappers.index(where: { $0.supportsObject(object) }) {
+        if let index = registeredMappers.index(where: { $0.supports(object) }) {
             return registeredMappers[index]
         }
         
@@ -162,17 +162,17 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     }
     
     open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.numberOfObjectsInSection(section)
+        return dataSource.numberOfObjects(inSection: section)
     }
 
     open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let object = dataSource.objectAtIndexPath(indexPath)
+        let object = dataSource.object(at: indexPath)
         guard let mapper = mapper(for: object) else {
             fatalError("You have to provide mapper that supports \(type(of: object))")
         }
         
         let cell = tableView.dequeueReusableCell(withIdentifier: mapper.cellIdentifier, for: indexPath)
-        mapper.mapObject(object, toCell: cell, atIndexPath: indexPath)
+        mapper.map(object: object, toCell: cell, at: indexPath)
         
         return cell
     }
