@@ -4,10 +4,10 @@ import Observer
 
 final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
-    public typealias Map = RawObject -> Object
-    private let map: Map
+    public typealias Map = (RawObject) -> Object
+    fileprivate let map: Map
     
-    private var disposable: Disposable?
+    fileprivate var disposable: Disposable?
     public let origin: DataSource<RawObject>
     
     // MARK: - Init
@@ -16,7 +16,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         disposable?.dispose()
     }
     
-    public init(origin: DataSource<RawObject>, map: Map) {
+    public init(origin: DataSource<RawObject>, map: @escaping Map) {
         self.origin = origin
         self.map = map
         
@@ -29,8 +29,8 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Sections
     
-    private var _sections: [MappingSection<RawObject, Object>] = []
-    private var sections: [MappingSection<RawObject, Object>] {
+    fileprivate var _sections: [MappingSection<RawObject, Object>] = []
+    fileprivate var sections: [MappingSection<RawObject, Object>] {
         get {
             if invalidated {
                 reload()
@@ -52,29 +52,29 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         return sections.count
     }
     
-    public override func sectionAtIndex(index: Int) -> Section<Object> {
+    public override func sectionAtIndex(_ index: Int) -> Section<Object> {
         return sections[index]
     }
     
-    override public func numberOfObjectsInSection(section: Int) -> Int {
+    override public func numberOfObjectsInSection(_ section: Int) -> Int {
         return sections[section].numberOfObjects
     }
     
-    override public func objectAtIndexPath(indexPath: NSIndexPath) -> Object {
-        return sections[indexPath.section].objectAtIndex(indexPath.item)
+    override public func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
+        return sections[(indexPath as NSIndexPath).section].objectAtIndex((indexPath as NSIndexPath).item)
     }
     
     // MARK: - Reload
     
-    private var invalidated = true
+    fileprivate var invalidated = true
     override public func invalidate() {
         invalidated = true
         
-        send(.Invalidate)
+        send(.invalidate)
     }
     
     // to prevent double reloading when MappingDataSource cause Origin to reload
-    private var reloading = true
+    fileprivate var reloading = true
     
     override public func reload() {
         reloading = true
@@ -85,26 +85,26 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         reloading = false
         sectionsIndexInvalid = false
 
-        send(.Reload)
+        send(.reload)
     }
     
-    public func reloadObjectAtIndexPath(indexPath: NSIndexPath) {
-        let section = sections[indexPath.section]
-        section.invalidateObjectAtIndex(indexPath.item)
+    public func reloadObjectAtIndexPath(_ indexPath: IndexPath) {
+        let section = sections[(indexPath as NSIndexPath).section]
+        section.invalidateObjectAtIndex((indexPath as NSIndexPath).item)
         
-        let change = ObjectChange(type: .Update, source: indexPath)
-        send(.ObjectUpdate(change))
+        let change = ObjectChange(type: .update, source: indexPath)
+        send(.objectUpdate(change))
     }
     
-    private var sectionsIndexInvalid = true
+    fileprivate var sectionsIndexInvalid = true
     
-    private func setNeedsSectionReindex() {
+    fileprivate func setNeedsSectionReindex() {
         sectionsIndexInvalid = true
     }
     
-    private func reindexSectionsIfNeeded() {
+    fileprivate func reindexSectionsIfNeeded() {
         if sectionsIndexInvalid {
-            for (index, section) in _sections.enumerate() {
+            for (index, section) in _sections.enumerated() {
                 section.originIndex = index
             }
         }
@@ -114,66 +114,66 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Events Handling
     
-    private func handleEvent(event: Event) {
+    fileprivate func handleEvent(_ event: Event) {
         switch event {
-        case .Invalidate:
+        case .invalidate:
             invalidate()
             
-        case .Reload where reloading:
+        case .reload where reloading:
             break
             
-        case .Reload:
+        case .reload:
             reload()
             
-        case .SectionUpdate(let change):
+        case .sectionUpdate(let change):
             setNeedsSectionReindex()
             applySectionChange(change)
             
             send(event)
             
-        case .ObjectUpdate(let change):
+        case .objectUpdate(let change):
             applyObjectChange(change)
             
             send(event)
             
-        case .WillBeginUpdate, .DidEndUpdate:
+        case .willBeginUpdate, .didEndUpdate:
             send(event)
         }
     }
     
-    private func applyObjectChange(change: ObjectChange) {
+    fileprivate func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
-        case .Insert:
+        case .insert:
             sections[change.target.section].insert(nil, atIndex: change.target.item)
             
-        case .Delete:
+        case .delete:
             sections[change.source.section].removeObjectAtIndex(change.source.item)
             
-        case .Move:
+        case .move:
             let object = sections[change.source.section].removeObjectAtIndex(change.source.item)
             sections[change.target.section].insert(object, atIndex: change.target.item)
             
-        case .Update:
+        case .update:
             sections[change.source.section].invalidateObjectAtIndex(change.source.item)
         }
     }
     
-    private func applySectionChange(change: SectionChange) {
+    fileprivate func applySectionChange(_ change: SectionChange) {
         switch change.type {
-        case .Insert:
+        case .insert:
             for index in change.indexes {
-                sections.insert(MappingSection(origin: origin, originIndex: index, map: map), atIndex: index)
+                sections.insert(MappingSection(origin: origin, originIndex: index, map: map), at: index)
             }
         
-        case .Delete:
+        case .delete:
             for index in change.indexes {
-                sections.removeAtIndex(index)
+                sections.remove(at: index)
             }
             
-        case .Move:
+        case .move:
             abort()
             
-        case .Update:
+        case .update:
             for index in change.indexes {
                 sections[index].invalidateObjects()
             }
@@ -182,11 +182,11 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
     
     // MARK: - Search
     
-    public func indexPathOf(predicate: Object -> Bool) -> NSIndexPath? {
-        for (sectionIndex, section) in sections.enumerate() {
+    public func indexPathOf(_ predicate: (Object) -> Bool) -> IndexPath? {
+        for (sectionIndex, section) in sections.enumerated() {
             for objectIndex in 0..<numberOfObjectsInSection(sectionIndex) {
                 if predicate(section.objectAtIndex(objectIndex)) {
-                    return NSIndexPath(forItem: objectIndex, inSection: sectionIndex)
+                    return IndexPath(item: objectIndex, section: sectionIndex)
                 }
             }
         }

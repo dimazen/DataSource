@@ -2,7 +2,7 @@
 import Foundation
 import Observer
 
-public class DataSource<Object> {
+open class DataSource<Object> {
     
     // MARK: - Init
     
@@ -10,58 +10,58 @@ public class DataSource<Object> {
     
     // MARK: - Observation
     
-    private let observers = DisablingObserverSet<Event>()
+    fileprivate let observers = DisablingObserverSet<Event>()
 
-    public func observe(changes: Event -> Void) -> Disposable {
+    open func observe(_ changes: (Event) -> Void) -> Disposable {
         return observers.add(changes)
     }
     
-    public func send(event: Event) {
+    open func send(_ event: Event) {
         observers.send(event)
     }
     
-    public func enableEvents() {
+    open func enableEvents() {
         observers.enable()
     }
     
-    public func disableEvents() {
+    open func disableEvents() {
         observers.disable()
     }
     
     // MARK: - Data Access
     
-    public var sectionsCount: Int {
+    open var sectionsCount: Int {
         fatalError("Not Implemented")
     }
     
-    public func sectionAtIndex(index: Int) -> Section<Object> {
+    open func sectionAtIndex(_ index: Int) -> Section<Object> {
         fatalError("Not Implemented")
     }
     
-    public func numberOfObjectsInSection(section: Int) -> Int {
+    open func numberOfObjectsInSection(_ section: Int) -> Int {
         return sectionAtIndex(section).numberOfObjects
     }
     
-    public func objectAtIndexPath(indexPath: NSIndexPath) -> Object {
-        return sectionAtIndex(indexPath.section).objects[indexPath.item]
+    open func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
+        return sectionAtIndex((indexPath as NSIndexPath).section).objects[(indexPath as NSIndexPath).item]
     }
     
-    public subscript(indexPath: NSIndexPath) -> Object {
+    open subscript(indexPath: IndexPath) -> Object {
         return objectAtIndexPath(indexPath)
     }
     
-    public subscript(index: Int) -> Section<Object> {
+    open subscript(index: Int) -> Section<Object> {
         return sectionAtIndex(index)
     }
       
     // MARK: - Reload
     
-    public func invalidate() {
-        send(.Invalidate)
+    open func invalidate() {
+        send(.invalidate)
     }
     
-    public func reload() {
-        send(.Reload)
+    open func reload() {
+        send(.reload)
     }
 }
 

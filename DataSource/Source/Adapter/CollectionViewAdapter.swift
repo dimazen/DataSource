@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 import Observer
 
-public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, UICollectionViewDelegate {
+open class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource, UICollectionViewDelegate {
     
     // MARK: - Init
 
@@ -15,9 +15,9 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - DataSource
 
-    private var disposable: Disposable?
+    fileprivate var disposable: Disposable?
     
-    public var dataSource: DataSource<Object>! {
+    open var dataSource: DataSource<Object>! {
         didSet {
             disposable?.dispose()
             disposable = dataSource?.observe { [unowned self] event in
@@ -28,7 +28,7 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - CollectionView 
     
-    public var collectionView: UICollectionView! {
+    open var collectionView: UICollectionView! {
         didSet {
             oldValue?.dataSource = nil
             oldValue?.delegate = nil
@@ -40,10 +40,10 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - Reloading
     
-    public func reload(animated: Bool = false) {
+    open func reload(_ animated: Bool = false) {
         if animated {
-            let range = NSMakeRange(0, collectionView.numberOfSections())
-            collectionView.reloadSections(NSIndexSet(indexesInRange: range))
+            let range = NSMakeRange(0, collectionView.numberOfSections)
+            collectionView.reloadSections(IndexSet(integersIn: range.toRange() ?? 0..<0))
         } else {
             collectionView.reloadData()
         }
@@ -51,14 +51,14 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - Mapping
   
-    private var registeredMappers: [ObjectMappable] = []
+    fileprivate var registeredMappers: [ObjectMappable] = []
     
-    public func registerMapper(mapper: ObjectMappable) {
+    open func registerMapper(_ mapper: ObjectMappable) {
         registeredMappers.append(mapper)
     }
     
-    private func mapperForObject(object: Object) -> ObjectMappable? {
-        if let index = registeredMappers.indexOf({ $0.supportsObject(object) }) {
+    fileprivate func mapperForObject(_ object: Object) -> ObjectMappable? {
+        if let index = registeredMappers.index(where: { $0.supportsObject(object) }) {
             return registeredMappers[index]
         }
         
@@ -67,34 +67,34 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - Event Handling
     
-    private var pendingEvents: [Event] = []
-    private var collectUpdateEvents = false
+    fileprivate var pendingEvents: [Event] = []
+    fileprivate var collectUpdateEvents = false
     
-    private func handleEvent(event: Event) {
+    fileprivate func handleEvent(_ event: Event) {
         switch event {
-        case .Invalidate:
+        case .invalidate:
             // no-op
             break
             
-        case .Reload:
+        case .reload:
             collectionView.reloadData()
           
-        case .WillBeginUpdate:
+        case .willBeginUpdate:
             collectUpdateEvents = true
             
-        case .DidEndUpdate:
+        case .didEndUpdate:
             collectUpdateEvents = false
             applyEvents(pendingEvents)
             pendingEvents.removeAll()
             
-        case .ObjectUpdate(let change):
+        case .objectUpdate(let change):
             if collectUpdateEvents {
                 pendingEvents.append(event)
             } else {
                 applyObjectChange(change)
             }
 
-        case .SectionUpdate(let change):
+        case .sectionUpdate(let change):
             if collectUpdateEvents {
                 pendingEvents.append(event)
             } else {
@@ -103,13 +103,13 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
         }
     }
     
-    private func applyEvents(events: [Event]) {
+    fileprivate func applyEvents(_ events: [Event]) {
         for event in events {
             switch event {
-            case .ObjectUpdate(let change):
+            case .objectUpdate(let change):
                 applyObjectChange(change)
                 
-            case .SectionUpdate(let change):
+            case .sectionUpdate(let change):
                 applySectionChange(change)
                 
             default:
@@ -118,55 +118,55 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
         }
     }
     
-    private func applyObjectChange(change: ObjectChange) {
+    fileprivate func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
-        case .Insert:
-            collectionView.insertItemsAtIndexPaths([change.target])
+        case .insert:
+            collectionView.insertItems(at: [change.target as IndexPath])
             
-        case .Delete:
-            collectionView.deleteItemsAtIndexPaths([change.source])
+        case .delete:
+            collectionView.deleteItems(at: [change.source as IndexPath])
             
-        case .Move:
-            collectionView.moveItemAtIndexPath(change.source, toIndexPath: change.target)
+        case .move:
+            collectionView.moveItem(at: change.source as IndexPath, to: change.target as IndexPath)
             
-        case .Update:
-            collectionView.reloadItemsAtIndexPaths([change.source])
+        case .update:
+            collectionView.reloadItems(at: [change.source as IndexPath])
         }
     }
     
-    private func applySectionChange(change: SectionChange) {
+    fileprivate func applySectionChange(_ change: SectionChange) {
         switch change.type {
-        case .Insert:
-            collectionView.insertSections(change.indexes)
+        case .insert:
+            collectionView.insertSections(change.indexes as IndexSet)
     
-        case .Delete:
-            collectionView.deleteSections(change.indexes)
+        case .delete:
+            collectionView.deleteSections(change.indexes as IndexSet)
             
-        case .Move:
+        case .move:
             abort()
             
-        case .Update:
-            collectionView.reloadSections(change.indexes)
+        case .update:
+            collectionView.reloadSections(change.indexes as IndexSet)
         }
     }
     
     // MARK: - UICollectionViewDataSource
 
-    public func numberOfSectionsInCollectionView(collectionView: UICollectionView) -> Int {
+    open func numberOfSections(in collectionView: UICollectionView) -> Int {
         return dataSource.sectionsCount
     }
   
-    public func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return dataSource.numberOfObjectsInSection(section)
     }
     
-    public func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let object = dataSource.objectAtIndexPath(indexPath)
         guard let mapper = mapperForObject(object) else {
-            fatalError("You have to provide mapper that supports \(object.dynamicType)")
+            fatalError("You have to provide mapper that supports \(type(of: object))")
         }
         
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier(mapper.cellIdentifier, forIndexPath: indexPath)
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: mapper.cellIdentifier, for: indexPath)
         mapper.mapObject(object, toCell: cell, atIndexPath: indexPath)
         
         return cell
@@ -174,43 +174,43 @@ public class CollectionViewAdapter<Object>: NSObject, UICollectionViewDataSource
     
     // MARK: - UICollectionViewDelegate
     
-    public typealias Confirmation = (Object, NSIndexPath) -> Bool
+    public typealias Confirmation = (Object, IndexPath) -> Bool
     
-    public var shouldSelect: Confirmation?
+    open var shouldSelect: Confirmation?
 
-    public func collectionView(collectionView: UICollectionView, shouldSelectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+    open func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
         let object = dataSource.objectAtIndexPath(indexPath)
         return shouldSelect?(object, indexPath) ?? true
     }
     
-    public var shouldDeselect: Confirmation?
+    open var shouldDeselect: Confirmation?
     
-    public func collectionView(collectionView: UICollectionView, shouldDeselectItemAtIndexPath indexPath: NSIndexPath) -> Bool {
+    open func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
         let object = dataSource.objectAtIndexPath(indexPath)
         return shouldDeselect?(object, indexPath) ?? true
     }
     
-    public typealias Selection = (Object, NSIndexPath) -> Void
+    public typealias Selection = (Object, IndexPath) -> Void
     
-    public var didSelect: Selection?
+    open var didSelect: Selection?
     
-    public func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let object = dataSource.objectAtIndexPath(indexPath)
         didSelect?(object, indexPath)
     }
     
-    public var didDeselect: Selection?
+    open var didDeselect: Selection?
     
-    public func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+    open func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath) {
         let object = dataSource.objectAtIndexPath(indexPath)
         didDeselect?(object, indexPath)
     }
     
     // MARK: - UIScrollViewDelegate
     
-    public var didScroll: (UIScrollView -> Void)?
+    open var didScroll: ((UIScrollView) -> Void)?
     
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         didScroll?(scrollView)
     }
 }

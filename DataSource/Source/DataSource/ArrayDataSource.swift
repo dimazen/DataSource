@@ -3,11 +3,11 @@ import Foundation
 
 final public class ArrayDataSource<Object>: DataSource<Object> {
     
-    private let resolver: (Void -> [ArraySection<Object>])?
+    fileprivate let resolver: ((Void) -> [ArraySection<Object>])?
     
     // MARK: - Init
     
-    public init(resolver: Void -> [ArraySection<Object>]) {
+    public init(resolver: @escaping (Void) -> [ArraySection<Object>]) {
         self.resolver = resolver
     }
     
@@ -17,7 +17,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    convenience public init(resolver: Void -> [[Object]]) {
+    convenience public init(resolver: @escaping (Void) -> [[Object]]) {
         self.init {
             return resolver().map { ArraySection(objects: $0) }
         }
@@ -29,23 +29,23 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
     
     // MARK: - Batch Update
 
-    private var updating: Bool = false
+    fileprivate var updating: Bool = false
 
     public func beginUpdate() {
         precondition(updating == false)
         updating = true
 
-        send(.WillBeginUpdate)
+        send(.willBeginUpdate)
     }
 
     public func endUpdate() {
         precondition(updating == true)
         updating = false
 
-        send(.DidEndUpdate)
+        send(.didEndUpdate)
     }
 
-    public func apply(silently: Bool = false, @noescape changes: Void -> Void) {
+    public func apply(_ silently: Bool = false, changes: (Void) -> Void) {
         if silently {
             disableEvents()
             
@@ -65,29 +65,29 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
 
     // MARK: - Invalidation
 
-    private var invalidated: Bool = true
+    fileprivate var invalidated: Bool = true
     
     override public func invalidate() {
         invalidated = true
         
-        send(.Invalidate)
+        send(.invalidate)
     }
 
     override public func reload() {
         reload(resolver?() ?? [])
     }
     
-    private func reload(sections: [ArraySection<Object>]) {
+    fileprivate func reload(_ sections: [ArraySection<Object>]) {
         _sections = sections
         invalidated = false
         
-        send(.Reload)
+        send(.reload)
     }
 
     // MARK: - Access
     
-    private var _sections: [ArraySection<Object>] = []
-    public private(set) var sections: [ArraySection<Object>] {
+    fileprivate var _sections: [ArraySection<Object>] = []
+    public fileprivate(set) var sections: [ArraySection<Object>] {
         get {
             if invalidated {
                 reload()
@@ -105,26 +105,26 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         return sections.count
     }
     
-    public override func sectionAtIndex(index: Int) -> Section<Object> {
+    public override func sectionAtIndex(_ index: Int) -> Section<Object> {
         return sections[index]
     }
 
-    override public func numberOfObjectsInSection(section: Int) -> Int {
+    override public func numberOfObjectsInSection(_ section: Int) -> Int {
         return sections[section].numberOfObjects
     }
     
-    override public func objectAtIndexPath(indexPath: NSIndexPath) -> Object {
-        return sections[indexPath.section].objectAtIndex(indexPath.item)
+    override public func objectAtIndexPath(_ indexPath: IndexPath) -> Object {
+        return sections[(indexPath as NSIndexPath).section].objectAtIndex((indexPath as NSIndexPath).item)
     }
     
     // MARK: - Mutation:Objects
     
-    public func appendObject(object: Object, toSection sectionIndex: Int) {
+    public func appendObject(_ object: Object, toSection sectionIndex: Int) {
         let insertionIndex = sections[sectionIndex].objects.endIndex
         insertObject(object, atIndex: insertionIndex, toSection: sectionIndex)
     }
     
-    public func appendObject(object: Object) {
+    public func appendObject(_ object: Object) {
         if sections.isEmpty {
             appendSection(ArraySection(objects: [object]))
         } else {
@@ -132,86 +132,86 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
         }
     }
     
-    public func insertObject(object: Object, atIndex index: Int, toSection sectionIndex: Int) {
+    public func insertObject(_ object: Object, atIndex index: Int, toSection sectionIndex: Int) {
         apply {
             sections[sectionIndex].insert(object, atIndex: index)
             
-            let change = ObjectChange(type: .Insert, target: NSIndexPath(forItem: index, inSection: sectionIndex))
-            send(.ObjectUpdate(change))
+            let change = ObjectChange(type: .insert, target: IndexPath(item: index, section: sectionIndex))
+            send(.objectUpdate(change))
         }
     }
     
-    public func removeObjectAtIndex(index: Int, inSection sectionIndex: Int) {
+    public func removeObjectAtIndex(_ index: Int, inSection sectionIndex: Int) {
         apply {
             sections[sectionIndex].removeAtIndex(index)
             
-            let change = ObjectChange(type: .Delete, source: NSIndexPath(forItem: index, inSection: sectionIndex))
-            send(.ObjectUpdate(change))
+            let change = ObjectChange(type: .delete, source: IndexPath(item: index, section: sectionIndex))
+            send(.objectUpdate(change))
         }
     }
     
-    public func removeObjectAtIndexPath(indexPath: NSIndexPath) {
-        removeObjectAtIndex(indexPath.item, inSection: indexPath.section)
+    public func removeObjectAtIndexPath(_ indexPath: IndexPath) {
+        removeObjectAtIndex((indexPath as NSIndexPath).item, inSection: (indexPath as NSIndexPath).section)
     }
     
-    public func replaceObjectAtIndexPath(indexPath: NSIndexPath, withObject object: Object) {
+    public func replaceObjectAtIndexPath(_ indexPath: IndexPath, withObject object: Object) {
         apply {
-            sections[indexPath.section][indexPath.item] = object
+            sections[(indexPath as NSIndexPath).section][(indexPath as NSIndexPath).item] = object
             
-            let change = ObjectChange(type: .Update, source: indexPath)
-            send(.ObjectUpdate(change))
+            let change = ObjectChange(type: .update, source: indexPath)
+            send(.objectUpdate(change))
         }
     }
     
-    public func moveObjectAtIndexPath(indexPath: NSIndexPath, to toIndexPath: NSIndexPath) {
+    public func moveObjectAtIndexPath(_ indexPath: IndexPath, to toIndexPath: IndexPath) {
         apply {
-            let object = sections[indexPath.section].removeAtIndex(indexPath.item)
-            sections[toIndexPath.section].insert(object, atIndex: toIndexPath.item)
+            let object = sections[(indexPath as NSIndexPath).section].removeAtIndex((indexPath as NSIndexPath).item)
+            sections[(toIndexPath as NSIndexPath).section].insert(object, atIndex: (toIndexPath as NSIndexPath).item)
             
-            let change = ObjectChange(type: .Move, source: indexPath, target: toIndexPath)
-            send(.ObjectUpdate(change))
+            let change = ObjectChange(type: .move, source: indexPath, target: toIndexPath)
+            send(.objectUpdate(change))
         }
     }
     
     // MARK: - Mutation:Sections
     
-    public func appendSection(section: ArraySection<Object>) {
+    public func appendSection(_ section: ArraySection<Object>) {
         insertSection(section, atIndex: sections.endIndex)
     }
     
-    public func insertSection(section: ArraySection<Object>, atIndex index: Int) {
+    public func insertSection(_ section: ArraySection<Object>, atIndex index: Int) {
         apply {
-            sections.insert(section, atIndex: index)
+            sections.insert(section, at: index)
 
-            let change = SectionChange(type: .Insert, indexes: NSIndexSet(index: index))
-            send(.SectionUpdate(change))
+            let change = SectionChange(type: .insert, indexes: IndexSet(integer: index))
+            send(.sectionUpdate(change))
         }
     }
     
-    public func removeSectionAtIndex(index: Int) {
+    public func removeSectionAtIndex(_ index: Int) {
         apply {
-            sections.removeAtIndex(index)
+            sections.remove(at: index)
             
-            let change = SectionChange(type: .Delete, indexes: NSIndexSet(index: index))
-            send(.SectionUpdate(change))
+            let change = SectionChange(type: .delete, indexes: IndexSet(integer: index))
+            send(.sectionUpdate(change))
         }
     }
     
-    public func setObjects(objects: [Object]) {
+    public func setObjects(_ objects: [Object]) {
         reload([ArraySection(objects: objects)])
     }
 
-    public func setSections(sections: [ArraySection<Object>]) {
+    public func setSections(_ sections: [ArraySection<Object>]) {
         reload(sections)
     }
     
     // MARK: - Search
     
-    public func indexPathOf(predicate: Object -> Bool) -> NSIndexPath? {
-        for (sectionIndex, section) in sections.enumerate() {
-            for (objectIndex, object) in section.objects.enumerate() {
+    public func indexPathOf(_ predicate: (Object) -> Bool) -> IndexPath? {
+        for (sectionIndex, section) in sections.enumerated() {
+            for (objectIndex, object) in section.objects.enumerated() {
                 if predicate(object) {
-                    return NSIndexPath(forItem: objectIndex, inSection: sectionIndex)
+                    return IndexPath(item: objectIndex, section: sectionIndex)
                 }
             }
         }
@@ -222,7 +222,7 @@ final public class ArrayDataSource<Object>: DataSource<Object> {
 
 extension ArrayDataSource where Object: Equatable {
  
-    public func removeObject(object: Object) {
+    public func removeObject(_ object: Object) {
         if let indexPath = indexPathOf(object) {
             removeObjectAtIndexPath(indexPath)
         }
@@ -231,10 +231,10 @@ extension ArrayDataSource where Object: Equatable {
     /**
      Complexity O(n)
      */
-    public func indexPathOf(object: Object) -> NSIndexPath? {
+    public func indexPathOf(_ object: Object) -> IndexPath? {
         for index in 0..<sectionsCount {
             if let objectIndex = sections[index].indexOf(object) {
-                return NSIndexPath(forItem: objectIndex, inSection: index)
+                return IndexPath(item: objectIndex, section: index)
             }
         }
         

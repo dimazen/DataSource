@@ -3,7 +3,7 @@ import Foundation
 import UIKit
 import Observer
 
-public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableViewDelegate {
+open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableViewDelegate {
     
     // MARK: - Init
     
@@ -15,9 +15,9 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
     
     // MARK: - DataSource
     
-    private var disposable: Disposable?
+    fileprivate var disposable: Disposable?
     
-    public var dataSource: DataSource<Object>! {
+    open var dataSource: DataSource<Object>! {
         didSet {
             disposable?.dispose()
             disposable = dataSource?.observe { [unowned self] event in
@@ -28,7 +28,7 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
 
     // MARK: - CollectionView
     
-    public var tableView: UITableView! {
+    open var tableView: UITableView! {
         didSet {
             oldValue?.dataSource = nil
             oldValue?.delegate = nil
@@ -40,29 +40,29 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
     
     // MARK: - Reloading
     
-    public func reload(animated: Bool = false) {
+    open func reload(_ animated: Bool = false) {
         if animated {
             let range = NSMakeRange(0, tableView.numberOfSections)
-            tableView.reloadSections(NSIndexSet(indexesInRange: range), withRowAnimation: .Automatic)
+            tableView.reloadSections(IndexSet(integersIn: range.toRange() ?? 0..<0), with: .automatic)
         } else {
             tableView.reloadData()
         }
     }
     
-    public func reloadIndexPath(indexPath: NSIndexPath, animated: Bool) {
-        tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: animated ? .Automatic : .None)
+    open func reloadIndexPath(_ indexPath: IndexPath, animated: Bool) {
+        tableView.reloadRows(at: [indexPath], with: animated ? .automatic : .none)
     }
     
     // MARK: - Mapping
     
-    private var registeredMappers: [ObjectMappable] = []
+    fileprivate var registeredMappers: [ObjectMappable] = []
     
-    public func registerMapper(mapper: ObjectMappable) {
+    open func registerMapper(_ mapper: ObjectMappable) {
         registeredMappers.append(mapper)
     }
     
-    private func mapperForObject(object: Object) -> ObjectMappable? {
-        if let index = registeredMappers.indexOf({ $0.supportsObject(object) }) {
+    fileprivate func mapperForObject(_ object: Object) -> ObjectMappable? {
+        if let index = registeredMappers.index(where: { $0.supportsObject(object) }) {
             return registeredMappers[index]
         }
         
@@ -71,34 +71,34 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
     
     // MARK: - Event Handling
     
-    private var pendingEvents: [Event] = []
-    private var collectUpdateEvents = false
+    fileprivate var pendingEvents: [Event] = []
+    fileprivate var collectUpdateEvents = false
     
-    private func handleEvent(event: Event) {
+    fileprivate func handleEvent(_ event: Event) {
         switch event {
-        case .Invalidate:
+        case .invalidate:
             // no-op
             break
             
-        case .Reload:
+        case .reload:
             tableView.reloadData()
             
-        case .WillBeginUpdate:
+        case .willBeginUpdate:
             collectUpdateEvents = true
             
-        case .DidEndUpdate:
+        case .didEndUpdate:
             collectUpdateEvents = false
             applyEvents(pendingEvents)
             pendingEvents.removeAll()
             
-        case .ObjectUpdate(let change):
+        case .objectUpdate(let change):
             if collectUpdateEvents {
                 pendingEvents.append(event)
             } else {
                 applyObjectChange(change)
             }
             
-        case .SectionUpdate(let change):
+        case .sectionUpdate(let change):
             if collectUpdateEvents {
                 pendingEvents.append(event)
             } else {
@@ -107,13 +107,13 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
         }
     }
     
-    private func applyEvents(events: [Event]) {
+    fileprivate func applyEvents(_ events: [Event]) {
         for event in events {
             switch event {
-            case .ObjectUpdate(let change):
+            case .objectUpdate(let change):
                 applyObjectChange(change)
                 
-            case .SectionUpdate(let change):
+            case .sectionUpdate(let change):
                 applySectionChange(change)
                 
             default:
@@ -122,55 +122,55 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
         }
     }
     
-    private func applyObjectChange(change: ObjectChange) {
+    fileprivate func applyObjectChange(_ change: ObjectChange) {
         switch change.type {
-        case .Insert:
-            tableView.insertRowsAtIndexPaths([change.target], withRowAnimation: .Automatic)
+        case .insert:
+            tableView.insertRows(at: [change.target as IndexPath], with: .automatic)
             
-        case .Delete:
-            tableView.deleteRowsAtIndexPaths([change.source], withRowAnimation: .Automatic)
+        case .delete:
+            tableView.deleteRows(at: [change.source as IndexPath], with: .automatic)
             
-        case .Move:
-            tableView.moveRowAtIndexPath(change.source, toIndexPath: change.target)
+        case .move:
+            tableView.moveRow(at: change.source as IndexPath, to: change.target as IndexPath)
             
-        case .Update:
-            tableView.reloadRowsAtIndexPaths([change.source], withRowAnimation: .Automatic)
+        case .update:
+            tableView.reloadRows(at: [change.source as IndexPath], with: .automatic)
         }
     }
     
-    private func applySectionChange(change: SectionChange) {
+    fileprivate func applySectionChange(_ change: SectionChange) {
         switch change.type {
-        case .Insert:
-            tableView.insertSections(change.indexes, withRowAnimation: .Automatic)
+        case .insert:
+            tableView.insertSections(change.indexes as IndexSet, with: .automatic)
             
-        case .Delete:
-            tableView.deleteSections(change.indexes, withRowAnimation: .Automatic)
+        case .delete:
+            tableView.deleteSections(change.indexes as IndexSet, with: .automatic)
             
-        case .Move:
+        case .move:
             abort()
             
-        case .Update:
-            tableView.reloadSections(change.indexes, withRowAnimation: .Automatic)
+        case .update:
+            tableView.reloadSections(change.indexes as IndexSet, with: .automatic)
         }
     }
     
     // MARK: - UITableViewDataSource
     
-    public func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+    open func numberOfSections(in tableView: UITableView) -> Int {
         return dataSource.sectionsCount
     }
     
-    public func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return dataSource.numberOfObjectsInSection(section)
     }
 
-    public func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+    open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let object = dataSource.objectAtIndexPath(indexPath)
         guard let mapper = mapperForObject(object) else {
-            fatalError("You have to provide mapper that supports \(object.dynamicType)")
+            fatalError("You have to provide mapper that supports \(type(of: object))")
         }
         
-        let cell = tableView.dequeueReusableCellWithIdentifier(mapper.cellIdentifier, forIndexPath: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: mapper.cellIdentifier, for: indexPath)
         mapper.mapObject(object, toCell: cell, atIndexPath: indexPath)
         
         return cell
@@ -178,27 +178,27 @@ public class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableV
 
     // MARK: - UITableViewDelegate
     
-    public typealias Selection = (Object, NSIndexPath) -> Void
+    public typealias Selection = (Object, IndexPath) -> Void
     
-    public var didSelect: Selection?
+    open var didSelect: Selection?
     
-    public func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+    open func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let object = dataSource.objectAtIndexPath(indexPath)
         didSelect?(object, indexPath)
     }
     
-    public var didDeselect: Selection?
+    open var didDeselect: Selection?
     
-    public func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
+    open func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         let object = dataSource.objectAtIndexPath(indexPath)
         didDeselect?(object, indexPath)
     }
     
     // MARK: - UIScrollViewDelegate
     
-    public var didScroll: ((UIScrollView) -> Void)?
+    open var didScroll: ((UIScrollView) -> Void)?
     
-    public func scrollViewDidScroll(scrollView: UIScrollView) {
+    open func scrollViewDidScroll(_ scrollView: UIScrollView) {
         didScroll?(scrollView)
     }
 }
