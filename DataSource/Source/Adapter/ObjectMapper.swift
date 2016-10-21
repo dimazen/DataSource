@@ -37,14 +37,14 @@ public protocol ObjectConsuming {
     
     associatedtype Object
     
-    func apply(object: Object)
+    func apply(_ object: Object)
 }
 
 extension ObjectConsumingMapper where Cell: ObjectConsuming, Cell.Object == Object {
     
     convenience public init() {
         self.init { object, consumer, _ in
-            consumer.apply(object: object)
+            consumer.apply(object)
         }
     }
 }
