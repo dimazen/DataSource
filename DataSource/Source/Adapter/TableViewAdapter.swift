@@ -56,7 +56,7 @@ open class TableViewAdapter<Object>: NSObject, UITableViewDataSource, UITableVie
     
     private var registeredMappers: [ObjectMappable] = []
     
-    open func register(mapper: ObjectMappable) {
+    open func register(_ mapper: ObjectMappable) {
         registeredMappers.append(mapper)
     }
     

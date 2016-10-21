@@ -10,7 +10,7 @@ public protocol ObjectMappable {
     func map(object: Any, toCell cell: Any, at: IndexPath)
 }
 
-final public class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
+open class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
     
     private let map: (Object, Cell, IndexPath) -> Void
     
@@ -18,15 +18,15 @@ final public class ObjectConsumingMapper<Object, Cell>: ObjectMappable {
         self.map = map
     }
     
-    public var cellIdentifier: String {
+    open var cellIdentifier: String {
         return String(describing: Cell.self)
     }
     
-    public func supports(_ object: Any) -> Bool {
+    open func supports(_ object: Any) -> Bool {
         return object is Object
     }
     
-    public func map(object: Any, toCell cell: Any, at indexPath: IndexPath) {
+    open func map(object: Any, toCell cell: Any, at indexPath: IndexPath) {
         if let object = object as? Object, let cell = cell as? Cell {
             map(object, cell, indexPath)
         }
