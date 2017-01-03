@@ -1,6 +1,8 @@
 
 import Foundation
 
+
+
 public enum ChangeType {
     
     case insert, delete, move, update

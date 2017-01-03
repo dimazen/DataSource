@@ -15,12 +15,11 @@
 		47BF39531C83534800AFF517 /* TableViewAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD822C17BE560E309E6A60 /* TableViewAdapter.swift */; };
 		47BF39571C83653000AFF517 /* MappingDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD8BFE211591F4BA99CEDB /* MappingDataSource.swift */; };
 		47BF39591C83686D00AFF517 /* MappingSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47BF39581C83686D00AFF517 /* MappingSection.swift */; };
-		47CBC16A1C84C34A00AB3B12 /* Observer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47CBC1691C84C34A00AB3B12 /* Observer.framework */; };
-		47CC869A1C83716400627303 /* DataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CC86991C83716400627303 /* DataSourceTests.swift */; };
 		47CC869C1C83716400627303 /* DataSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADCB899A1C18822000188D1B /* DataSource.framework */; };
 		47CC86A31C83717100627303 /* MappingDataSourceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CC86A21C83717100627303 /* MappingDataSourceTests.swift */; };
-		47CC86A51C8371A600627303 /* ArrayDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CC86A41C8371A600627303 /* ArrayDataSource.swift */; };
 		ADCB899E1C18822000188D1B /* DataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = ADCB899D1C18822000188D1B /* DataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		ADCF97721E1C19FE0040096E /* Observer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADFA6A4D1E1C199000473CFE /* Observer.framework */; };
+		ADFA6A4E1E1C199000473CFE /* Observer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADFA6A4D1E1C199000473CFE /* Observer.framework */; };
 		CFAD82E596CCB4DEA9722552 /* DisablingObserverSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD888DC0E7D0FD955C99A3 /* DisablingObserverSet.swift */; };
 		CFAD82FA7608C387450E22DE /* DataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD852FF1286DE595A0B656 /* DataSource.swift */; };
 		CFAD8D77BB8CB75D5500E94A /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFAD8C1D3004173A85499DD2 /* Event.swift */; };
@@ -41,15 +40,13 @@
 		4741D7EB1CA1C3B60074747C /* Section.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		47BF39501C834EF700AFF517 /* ObjectMapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectMapper.swift; sourceTree = "<group>"; };
 		47BF39581C83686D00AFF517 /* MappingSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingSection.swift; sourceTree = "<group>"; };
-		47CBC1691C84C34A00AB3B12 /* Observer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Observer.framework; path = "../Observer/build/Release-iphoneos/Observer.framework"; sourceTree = "<group>"; };
 		47CC86971C83716400627303 /* DataSourceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DataSourceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		47CC86991C83716400627303 /* DataSourceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceTests.swift; sourceTree = "<group>"; };
 		47CC869B1C83716400627303 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		47CC86A21C83717100627303 /* MappingDataSourceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MappingDataSourceTests.swift; sourceTree = "<group>"; };
-		47CC86A41C8371A600627303 /* ArrayDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayDataSource.swift; sourceTree = "<group>"; };
 		ADCB899A1C18822000188D1B /* DataSource.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DataSource.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ADCB899D1C18822000188D1B /* DataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataSource.h; sourceTree = "<group>"; };
 		ADCB899F1C18822000188D1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		ADFA6A4D1E1C199000473CFE /* Observer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Observer.framework; path = Carthage/Build/iOS/Observer.framework; sourceTree = "<group>"; };
 		CFAD8035F9FF8C76EF31EAE2 /* ArrayDataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ArrayDataSource.swift; sourceTree = "<group>"; };
 		CFAD822C17BE560E309E6A60 /* TableViewAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableViewAdapter.swift; sourceTree = "<group>"; };
 		CFAD852FF1286DE595A0B656 /* DataSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataSource.swift; sourceTree = "<group>"; };
@@ -64,6 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ADCF97721E1C19FE0040096E /* Observer.framework in Frameworks */,
 				47CC869C1C83716400627303 /* DataSource.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47CBC16A1C84C34A00AB3B12 /* Observer.framework in Frameworks */,
+				ADFA6A4E1E1C199000473CFE /* Observer.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -82,9 +80,7 @@
 		47CC86981C83716400627303 /* DataSourceTests */ = {
 			isa = PBXGroup;
 			children = (
-				47CC86991C83716400627303 /* DataSourceTests.swift */,
 				47CC86A21C83717100627303 /* MappingDataSourceTests.swift */,
-				47CC86A41C8371A600627303 /* ArrayDataSource.swift */,
 				47CC869B1C83716400627303 /* Info.plist */,
 			);
 			path = DataSourceTests;
@@ -100,11 +96,11 @@
 		ADCB89901C18822000188D1B = {
 			isa = PBXGroup;
 			children = (
-				47CBC1691C84C34A00AB3B12 /* Observer.framework */,
 				47E1EEDF1C8333F1007272BF /* External */,
 				ADCB899C1C18822000188D1B /* DataSource */,
 				47CC86981C83716400627303 /* DataSourceTests */,
 				ADCB899B1C18822000188D1B /* Products */,
+				ADFA6A4C1E1C199000473CFE /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -125,6 +121,14 @@
 				CFAD86F1FF8C8528B5C6CEAA /* Source */,
 			);
 			path = DataSource;
+			sourceTree = "<group>";
+		};
+		ADFA6A4C1E1C199000473CFE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ADFA6A4D1E1C199000473CFE /* Observer.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		CFAD81346EC97B5681A700EA /* Adapter */ = {
@@ -287,8 +291,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47CC869A1C83716400627303 /* DataSourceTests.swift in Sources */,
-				47CC86A51C8371A600627303 /* ArrayDataSource.swift in Sources */,
 				47CC86A31C83717100627303 /* MappingDataSourceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -326,9 +328,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = DataSourceTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks $(FRAMEWORK_SEARCH_PATHS)";
 				PRODUCT_BUNDLE_IDENTIFIER = io.zen.DataSourceTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
@@ -339,9 +345,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = DataSourceTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks $(FRAMEWORK_SEARCH_PATHS)";
 				PRODUCT_BUNDLE_IDENTIFIER = io.zen.DataSourceTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 3.0;
@@ -452,7 +462,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/Carthage/Build/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"${SRCROOT}/Carthage/Build/**",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = DataSource/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
@@ -474,7 +487,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				FRAMEWORK_SEARCH_PATHS = "${SRCROOT}/Carthage/Build/**";
+				FRAMEWORK_SEARCH_PATHS = (
+					"${SRCROOT}/Carthage/Build/**",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = DataSource/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;

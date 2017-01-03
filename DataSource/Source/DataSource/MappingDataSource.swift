@@ -42,7 +42,7 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
         }
         
         set {
-            _sections = sections
+            _sections = newValue
         }
     }
     
@@ -126,15 +126,19 @@ final public class MappingDataSource<RawObject, Object>: DataSource<Object> {
             reload()
             
         case .sectionUpdate(let change):
-            setNeedsSectionReindex()
-            applySectionChange(change)
-            
-            send(event)
+            if !invalidated {
+                setNeedsSectionReindex()
+                applySectionChange(change)
+                
+                send(event)
+            }
             
         case .objectUpdate(let change):
-            applyObjectChange(change)
-            
-            send(event)
+            if !invalidated {
+                applyObjectChange(change)
+                
+                send(event)
+            }
             
         case .willBeginUpdate, .didEndUpdate:
             send(event)

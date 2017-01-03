@@ -1,5 +1,6 @@
 
 import XCTest
+import DataSource
 
 class MappingDataSourceTests: XCTestCase {
     
@@ -14,7 +15,20 @@ class MappingDataSourceTests: XCTestCase {
     }
     
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let dataSource = ArrayDataSource<Int>()
+        let mappingDataSource = MappingDataSource(origin: dataSource) { value -> String in
+            return String(value)
+        }
+        
+        dataSource.append(1)
+        
+        mappingDataSource.sectionsCount
+        
+        dataSource.append(section: ArraySection(objects: [10]))
+        dataSource.append(section: ArraySection(objects: [20]))
+        
+        print(mappingDataSource.numberOfObjects(inSection: 0))
+        print(mappingDataSource.numberOfObjects(inSection: 1))
+        print(mappingDataSource.numberOfObjects(inSection: 2))
     }
 }
